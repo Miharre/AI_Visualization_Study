@@ -1,8 +1,24 @@
 import streamlit as st
 import pandas as pd
-import os
+import gspread
+from google.oauth2.service_account import Credentials
 
 st.title("AI-Assisted Data Visualization Study")
+
+# Google Sheets connection
+scope = [
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/drive"
+]
+
+creds = Credentials.from_service_account_info(
+    st.secrets["gcp_service_account"],
+    scopes=scope
+)
+
+client = gspread.authorize(creds)
+
+sheet = client.open("AI_Visualization_Responses").sheet1
 
 # Mode selection
 mode = st.radio("Select Mode", ["Without AI", "With AI"])
@@ -47,12 +63,7 @@ if mode == "With AI":
 # Participant response
 user_response = st.text_area("Write your insight here:")
 
-# Save response to CSV
-file_exists = os.path.isfile("responses.csv")
-
+# Submit to Google Sheets
 if st.button("Submit"):
-    with open("responses.csv", "a", encoding="utf-8") as f:
-        if not file_exists:
-            f.write("Name,Mode,Response\n")
-        f.write(f"{user_name},{mode},{user_response}\n")
-    st.success("Response saved!")
+    sheet.append_row([user_name, mode, user_response])
+    st.success("Response saved to Google Sheets!")
