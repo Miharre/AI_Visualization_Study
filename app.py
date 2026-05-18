@@ -18,7 +18,7 @@ creds = Credentials.from_service_account_info(
 
 client = gspread.authorize(creds)
 
-sheet = client.open("AI_Visualization_Responses").sheet1
+sheet = client.open_by_key("1_1JebkKG-A21WQ_zh_Pt4Kt6POUMpqQh85zxtZu5wFk").sheet1
 
 # Mode selection
 mode = st.radio("Select Mode", ["Without AI", "With AI"])
